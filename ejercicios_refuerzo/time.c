@@ -50,7 +50,7 @@ main (int argc, char *argv[])
       wait (NULL);
       gettimeofday (&end, NULL);
       read (fd[0], &start, sizeof (struct timeval));
-      printf ("\nElapsed time: %ld ms\n", end.tv_usec - start.tv_usec);
+      printf ("\nElapsed time: %ld µs\n", end.tv_usec - start.tv_usec);
       close (fd[1]);
       close (fd[0]);
     }
