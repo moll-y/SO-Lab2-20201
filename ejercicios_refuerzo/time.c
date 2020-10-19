@@ -13,7 +13,7 @@ int
 main (int argc, char *argv[])
 {
   struct timeval start, end;
-  int fd[2], pid;
+  int fd[2];
 
   if (argc == 1)
     {
@@ -22,16 +22,15 @@ main (int argc, char *argv[])
     }
   if (pipe (fd) < 0)
     {
-      fprintf (stderr, "error: pipe(fd) failed\n");
+      fprintf (stderr, "time: pipe(fd) failed\n");
       exit (1);
     }
-  if ((pid = fork ()) < 0)
+  switch (fork ())
     {
-      fprintf (stderr, "error: fork() failed\n");
+    case -1:
+      fprintf (stderr, "time: fork() failed\n");
       exit (1);
-    }
-  else if (pid == 0)
-    {
+    case 0:
       close (fd[0]);
       /*
        * All statements after execlp call are ignored if it's 
@@ -41,18 +40,16 @@ main (int argc, char *argv[])
       gettimeofday (&start, NULL);
       write (fd[1], &start, sizeof (struct timeval));
       execlp (argv[1], ".", argv[2], NULL);
-      fprintf (stderr, "error: execlp(\"%s\", \".\", \"%s\") failed\n",
+      fprintf (stderr, "time: execlp(\"%s\", \".\", \"%s\") failed\n",
 	       argv[1], argv[2]);
       exit (1);
-    }
-  else
-    {
+    default:
       wait (NULL);
       gettimeofday (&end, NULL);
+      close (fd[1]);
       read (fd[0], &start, sizeof (struct timeval));
       printf ("\nElapsed time: %ld µs\n", end.tv_usec - start.tv_usec);
-      close (fd[1]);
       close (fd[0]);
+      exit (0);
     }
-  return 0;
 }
