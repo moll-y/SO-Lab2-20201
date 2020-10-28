@@ -47,7 +47,11 @@ main (int argc, char *argv[])
       wait (NULL);
       gettimeofday (&end, NULL);
       close (fd[1]);
-      read (fd[0], &start, sizeof (struct timeval));
+      if ((read (fd[0], &start, sizeof (struct timeval))) == -1)
+        {
+          fprintf (stderr, "time: can't read from child pipe");
+          exit (1);
+        } 
       printf ("\nElapsed time: %ld µs\n", end.tv_usec - start.tv_usec);
       close (fd[0]);
       exit (0);
