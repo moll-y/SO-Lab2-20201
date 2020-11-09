@@ -1,5 +1,5 @@
 /*
- * Time get the entire time exection of a -C FILE. It takes 
+ * Time get the entire time execution of a c-file. It takes 
  * commands of the form: -C FILE [OPTION]. And makes use of 
  * pipe(), fork(), execlp() and wait() System Calls.
  */
@@ -13,6 +13,7 @@ int
 main (int argc, char *argv[])
 {
   struct timeval start, end;
+  char *argvx[argc - 1];
   int fd[2];
 
   if (argc == 1)
@@ -32,6 +33,7 @@ main (int argc, char *argv[])
       exit (1);
     case 0:
       close (fd[0]);
+      for (int j = 0, i = 1; (argvx[j] = argv[i]) != NULL; i++, j++);
       /*
        * All statements after execlp call are ignored if it's 
        * executed successfully, that's why it's needed getting 
@@ -39,19 +41,18 @@ main (int argc, char *argv[])
        */
       gettimeofday (&start, NULL);
       write (fd[1], &start, sizeof (struct timeval));
-      execlp (argv[1], ".", argv[2], NULL);
-      fprintf (stderr, "time: execlp(\"%s\", \".\", \"%s\") failed\n",
-	       argv[1], argv[2]);
+      execvp (argvx[0], argvx);
+      fprintf (stderr, "time: exec(\"%s\") failed\n", argvx[0]);
       exit (1);
     default:
       wait (NULL);
       gettimeofday (&end, NULL);
       close (fd[1]);
       if ((read (fd[0], &start, sizeof (struct timeval))) == -1)
-        {
-          fprintf (stderr, "time: can't read from child pipe");
-          exit (1);
-        } 
+	    {
+	      fprintf (stderr, "time: could not read from child pipe");
+	      exit (1);
+	    }
       printf ("\nElapsed time: %ld µs\n", end.tv_usec - start.tv_usec);
       close (fd[0]);
       exit (0);
