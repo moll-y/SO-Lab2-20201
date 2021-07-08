@@ -6,11 +6,11 @@
 #include "lex.h"
 
 typedef struct _sParser {
-	Lex * lex;
-	Token * lah;
+    Lex *lex;
+    Token *lah;
 } Parser;
 
-Parser * parse_make(Lex * lex);
+Parser *parse_make(Lex * lex);
 void parse_parse();
 
 #endif

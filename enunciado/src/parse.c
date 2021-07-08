@@ -27,172 +27,189 @@ static void parse_newline_list_prime(void);
 
 // ----------------------------------------------------------------------------
 
-static Parser * parser;
+static Parser *parser;
 
-Parser * parse_make(Lex * lex) {
-	parser = malloc(sizeof(Parser));
-	parser->lex = lex;
-	return parser;
+Parser *parse_make(Lex * lex)
+{
+    parser = malloc(sizeof(Parser));
+    parser->lex = lex;
+    return parser;
 }
 
-static bool parse_expect(Type type) {
-	return parser->lah->type == type;
+static bool parse_expect(Type type)
+{
+    return parser->lah->type == type;
 }
 
-static bool parse_accept(Type type) {
-	if (parse_expect(type)) {
-		parser->lah = lex_gettok();
-		return true;
-	}
-
-	return false;
-}
-
-void parse_parse() {
+static bool parse_accept(Type type)
+{
+    if (parse_expect(type)) {
 	parser->lah = lex_gettok();
+	return true;
+    }
 
-	parse_program();
+    return false;
+}
 
-	if (parser->lah->type != TEOF) {
-		fprintf(stderr, "parse_parse: error\n");
-		}
+void parse_parse()
+{
+    parser->lah = lex_gettok();
+
+    parse_program();
+
+    if (parser->lah->type != TEOF) {
+	fprintf(stderr, "parse_parse: error\n");
+    }
 }
 
 // program            : command linebreak
 //                    | linebreak
 //                    ;
-static void parse_program(void) {
-	if (parse_expect(TNewline)) {
-		parse_linebreak();
-		return;
-	}
-
-	parse_command();
+static void parse_program(void)
+{
+    if (parse_expect(TNewline)) {
 	parse_linebreak();
+	return;
+    }
+
+    parse_command();
+    parse_linebreak();
 }
 
 // command            : list separator_op
 //                    | list
 //                    ;
-static void parse_command(void) {
-	parse_list();
+static void parse_command(void)
+{
+    parse_list();
 
-	if (parse_expect(TAnd)) {
-		parse_separator_op();
-	}
+    if (parse_expect(TAnd)) {
+	parse_separator_op();
+    }
 }
 
 // list               : simple_command list_prime
 //                    ;
-static void parse_list(void) {
-	parse_simple_command();
-	parse_list_prime();
+static void parse_list(void)
+{
+    parse_simple_command();
+    parse_list_prime();
 }
 
 // list_prime         : separator_op list_prime
 //                    | /*eps*/
 //                    ;
-static void parse_list_prime(void) {
-	if (parse_expect(TAnd)) {
-		parse_separator_op();
-		parse_list_prime();
-	}
+static void parse_list_prime(void)
+{
+    if (parse_expect(TAnd)) {
+	parse_separator_op();
+	parse_list_prime();
+    }
 }
 
 // separator_op       : TAnd
 //                    ;
-static void parse_separator_op(void) {
-	if (!parse_accept(TAnd)) {
-		fprintf(stderr, "parse_separator_op: error\n");
-	}
+static void parse_separator_op(void)
+{
+    if (!parse_accept(TAnd)) {
+	fprintf(stderr, "parse_separator_op: error\n");
+    }
 }
 
 // simple_command     : cmd_name
 //                    : cmd_name io_file
 //                    | cmd_name cmd_suffix io_file
 //                    ;
-static void parse_simple_command(void) {
-	parse_cmd_name();
+static void parse_simple_command(void)
+{
+    parse_cmd_name();
 
-	if (parse_expect(TGreat)) {
-		parse_io_file();
+    if (parse_expect(TGreat)) {
+	parse_io_file();
 
-		return;
-	}
+	return;
+    }
 
-	if (parse_expect(TWord)) {
-		parse_cmd_suffix();
-		parse_io_file();
+    if (parse_expect(TWord)) {
+	parse_cmd_suffix();
+	parse_io_file();
 
-		return;
-	}
+	return;
+    }
 }
 
 // cmd_name           : TWord
 //                    ;
-static void parse_cmd_name(void) {
-	if (!parse_accept(TWord)) {
-		fprintf(stderr, "parse_cmd_name: error\n");
-	}
+static void parse_cmd_name(void)
+{
+    if (!parse_accept(TWord)) {
+	fprintf(stderr, "parse_cmd_name: error\n");
+    }
 }
 
 // cmd_suffix         : TWord cmd_suffix
 //                    | /*eps*/
 //                    ;
-static void parse_cmd_suffix(void) {
-	if (parse_accept(TWord)) {
-		parse_cmd_suffix();
-	}
+static void parse_cmd_suffix(void)
+{
+    if (parse_accept(TWord)) {
+	parse_cmd_suffix();
+    }
 }
 
 // io_file            : TGreat filename
 //                    | /*eps*/
 //                    ;
-static void parse_io_file(void) {
-	if (parse_accept(TGreat)) {
-		parse_filename();
-	}
+static void parse_io_file(void)
+{
+    if (parse_accept(TGreat)) {
+	parse_filename();
+    }
 }
 
 // filename           : TWord
 //                    ;
-static void parse_filename(void) {
-	if (parse_accept(TWord)) {
-		if (parse_expect(TWord)) {
-			fprintf(stderr, "filename: error\n");
-		}
-
-		return;
+static void parse_filename(void)
+{
+    if (parse_accept(TWord)) {
+	if (parse_expect(TWord)) {
+	    fprintf(stderr, "filename: error\n");
 	}
 
-	fprintf(stderr, "filename: error\n");
+	return;
+    }
+
+    fprintf(stderr, "filename: error\n");
 
 }
 
 // linebreak          : newline_list
 //                    | /*eps*/
 //                    ;
-static void parse_linebreak(void) {
-	if (parse_expect(TNewline)) {
-		parse_newline_list();
-	}
+static void parse_linebreak(void)
+{
+    if (parse_expect(TNewline)) {
+	parse_newline_list();
+    }
 }
 
 // newline_list       : TNewline newline_list_prime
 //                    ;
-static void parse_newline_list(void) {
-	if (!parse_accept(TNewline)) {
-		fprintf(stderr, "parse_separator_op: error\n");
-		return;
-	}
+static void parse_newline_list(void)
+{
+    if (!parse_accept(TNewline)) {
+	fprintf(stderr, "parse_separator_op: error\n");
+	return;
+    }
 
-	parse_newline_list_prime();
+    parse_newline_list_prime();
 }
 
 // newline_list_prime : TNewline newline_list_prime
 //                    ; /*eps*/
-static void parse_newline_list_prime(void) {
-	if (parse_accept(TNewline)) {
-		parse_newline_list_prime();
-	}
+static void parse_newline_list_prime(void)
+{
+    if (parse_accept(TNewline)) {
+	parse_newline_list_prime();
+    }
 }
