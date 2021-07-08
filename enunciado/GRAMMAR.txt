@@ -1,3 +1,17 @@
+/* -------------------------------------------------------
+   The grammar symbols
+   ------------------------------------------------------- */
+
+%token  TWord
+%token  TNewline
+
+%token  TAnd    TGreat
+/*      '&'     '>'      */
+
+/* -------------------------------------------------------
+   The Grammar
+   ------------------------------------------------------- */
+
 program            : command linebreak
                    | linebreak
                    ;
@@ -10,7 +24,10 @@ list               : simple_command list_prime
                    ;
 
 list_prime         : separator_op list_prime
-                   | /* eps */
+                   | /*eps*/
+                   ;
+
+separator_op       : TAnd
                    ;
 
 simple_command     : cmd_name io_file
@@ -21,22 +38,22 @@ cmd_name           : TWord
                    ;
 
 cmd_suffix         : TWord cmd_suffix
-                   | /* eps */
+                   | /*eps*/
                    ;
 
 io_file            : TGreat filename
-                   | /* eps */
+                   | /*eps*/
                    ;
 
 filename           : TWord
                    ;
 
 linebreak          : newline_list
-                   | /* eps */
+                   | /*eps*/
                    ;
 
 newline_list       : TNewline newline_list_prime
                    ;
 
 newline_list_prime : TNewline newline_list_prime
-                   ; /* eps */
+                   ; /*eps*/
