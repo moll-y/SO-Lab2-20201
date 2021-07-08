@@ -1,37 +1,42 @@
-program        : command linebreak
-               | linebreak
-               ;
+program            : command linebreak
+                   | linebreak
+                   ;
 
-command        : list separator_op
-               | list
-               ;
+command            : list separator_op
+                   | list
+                   ;
 
-list           : list separator_op
-               | simple_command
-               ;
+list               : simple_command list_prime
+                   ;
 
-simple_command : cmd_name io_file
-               | cmd_name cmd_suffix io_file
-               ;
+list_prime         : separator_op list_prime
+                   | /* eps */
+                   ;
 
-cmd_name       : TWord
-               ;
+simple_command     : cmd_name io_file
+                   | cmd_name cmd_suffix io_file
+                   ;
 
-cmd_suffix     : TWord cmd_suffix
-               | /* eps */
-               ;
+cmd_name           : TWord
+                   ;
 
-io_file        : TGreat filename
-               | /* eps */
-               ;
+cmd_suffix         : TWord cmd_suffix
+                   | /* eps */
+                   ;
 
-filename       : TWord
-               ;
+io_file            : TGreat filename
+                   | /* eps */
+                   ;
 
-linebreak      : newline_list
-               | /* eps */
-               ;
+filename           : TWord
+                   ;
 
-newline_list   : newline_list TNewline
-               | TNewline
-               ;
+linebreak          : newline_list
+                   | /* eps */
+                   ;
+
+newline_list       : TNewline newline_list_prime
+                   ;
+
+newline_list_prime : TNewline newline_list_prime
+                   ; /* eps */
