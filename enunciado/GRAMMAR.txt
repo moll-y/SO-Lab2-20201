@@ -1,0 +1,37 @@
+program        : command linebreak
+               | linebreak
+               ;
+
+command        : list separator_op
+               | list
+               ;
+
+list           : list separator_op
+               | simple_command
+               ;
+
+simple_command : cmd_name io_file
+               | cmd_name cmd_suffix io_file
+               ;
+
+cmd_name       : TWord
+               ;
+
+cmd_suffix     : TWord cmd_suffix
+               | /* eps */
+               ;
+
+io_file        : TGreat filename
+               | /* eps */
+               ;
+
+filename       : TWord
+               ;
+
+linebreak      : newline_list
+               | /* eps */
+               ;
+
+newline_list   : newline_list TNewline
+               | TNewline
+               ;
