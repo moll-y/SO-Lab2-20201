@@ -60,13 +60,24 @@ static void lex_ignore(void)
 static Token *lex_emit(Type type)
 {
     Token *tok = malloc(sizeof(Token));
+    tok->type = type;
+
+    if (type == TNewline) {
+	tok->text = "\\n";
+	return tok;
+    }
+
+    if (type == TEOF) {
+	tok->text = "EOF";
+	return tok;
+    }
+
     size_t n_chars = lex->lah - lex->srt;
 
     tok->text = malloc(sizeof(char) * (n_chars + 1));
     strncpy(tok->text, lex->buf + lex->srt, n_chars);
 
     tok->text[n_chars] = '\0';
-    tok->type = type;
     lex->srt = lex->lah;
     return tok;
 }
