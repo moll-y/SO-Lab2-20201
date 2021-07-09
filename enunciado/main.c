@@ -14,7 +14,14 @@ int main(void)
 
     while (fgets(input, LEN, stdin)) {
 	lex_sreadfrom(input);
-	parse_parse();
+	Node *node = parse_parse();
+
+	for (; node->next; node = node->next) {
+	    if (node->token != NULL) {
+		printf("%s -> ", node->token->text);
+	    }
+	}
+	printf("\n");
     }
     free(lex);
     free(parser);
