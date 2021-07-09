@@ -10,7 +10,13 @@ typedef struct _sParser {
     Token *lah;
 } Parser;
 
-Parser *parse_make(Lex * lex);
-void parse_parse();
+
+typedef struct _sNode {
+    Token *token;
+    struct _sNode *next;
+} Node;
+
+Parser *parse_make(Lex *);
+Node *parse_parse(void);
 
 #endif

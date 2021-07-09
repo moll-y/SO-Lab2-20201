@@ -9,8 +9,8 @@
 #include "lex.h"
 #include "parse.h"
 
-static bool parse_expect(Type type);
-static bool parse_accept(Type type);
+static bool parse_expect(Type);
+static bool parse_accept(Type);
 static void parse_program(void);
 static void parse_command(void);
 static void parse_list(void);
@@ -51,15 +51,28 @@ static bool parse_accept(Type type)
     return false;
 }
 
-void parse_parse()
+Node *root;
+Node *node;
+
+Node *parse_parse(void)
 {
     parser->lah = lex_gettok();
+    root = malloc(sizeof(Node));
+    root->next = NULL;
+    node = root;
 
     parse_program();
 
     if (parser->lah->type != TEOF) {
 	fprintf(stderr, "parse_parse: error\n");
     }
+
+    Node *next = malloc(sizeof(Node));
+    next->token = parser->lah;
+    next->next = NULL;
+    node->next = next;
+    node = next;
+    return root;
 }
 
 // program            : command linebreak
@@ -111,6 +124,12 @@ static void parse_list_prime(void)
 //                    ;
 static void parse_separator_op(void)
 {
+    Node *next = malloc(sizeof(Node));
+    next->token = parser->lah;
+    next->next = NULL;
+    node->next = next;
+    node = next;
+
     if (!parse_accept(TAnd)) {
 	fprintf(stderr, "parse_separator_op: error\n");
     }
@@ -126,14 +145,12 @@ static void parse_simple_command(void)
 
     if (parse_expect(TGreat)) {
 	parse_io_file();
-
 	return;
     }
 
     if (parse_expect(TWord)) {
 	parse_cmd_suffix();
 	parse_io_file();
-
 	return;
     }
 }
@@ -142,6 +159,12 @@ static void parse_simple_command(void)
 //                    ;
 static void parse_cmd_name(void)
 {
+    Node *next = malloc(sizeof(Node));
+    next->token = parser->lah;
+    next->next = NULL;
+    node->next = next;
+    node = next;
+
     if (!parse_accept(TWord)) {
 	fprintf(stderr, "parse_cmd_name: error\n");
     }
@@ -152,6 +175,12 @@ static void parse_cmd_name(void)
 //                    ;
 static void parse_cmd_suffix(void)
 {
+    Node *next = malloc(sizeof(Node));
+    next->token = parser->lah;
+    next->next = NULL;
+    node->next = next;
+    node = next;
+
     if (parse_accept(TWord)) {
 	parse_cmd_suffix();
     }
@@ -162,6 +191,12 @@ static void parse_cmd_suffix(void)
 //                    ;
 static void parse_io_file(void)
 {
+    Node *next = malloc(sizeof(Node));
+    next->token = parser->lah;
+    next->next = NULL;
+    node->next = next;
+    node = next;
+
     if (parse_accept(TGreat)) {
 	parse_filename();
     }
@@ -171,7 +206,14 @@ static void parse_io_file(void)
 //                    ;
 static void parse_filename(void)
 {
+    Node *next = malloc(sizeof(Node));
+    next->token = parser->lah;
+    next->next = NULL;
+    node->next = next;
+    node = next;
+
     if (parse_accept(TWord)) {
+
 	if (parse_expect(TWord)) {
 	    fprintf(stderr, "filename: error\n");
 	}
@@ -197,6 +239,12 @@ static void parse_linebreak(void)
 //                    ;
 static void parse_newline_list(void)
 {
+    Node *next = malloc(sizeof(Node));
+    next->token = parser->lah;
+    next->next = NULL;
+    node->next = next;
+    node = next;
+
     if (!parse_accept(TNewline)) {
 	fprintf(stderr, "parse_separator_op: error\n");
 	return;
@@ -209,6 +257,12 @@ static void parse_newline_list(void)
 //                    ; /*eps*/
 static void parse_newline_list_prime(void)
 {
+    Node *next = malloc(sizeof(Node));
+    next->token = parser->lah;
+    next->next = NULL;
+    node->next = next;
+    node = next;
+
     if (parse_accept(TNewline)) {
 	parse_newline_list_prime();
     }
